@@ -1,4 +1,4 @@
-USE [bapu]
+USE [XXX]
 GO
 /****** Object:  StoredProcedure [dbo].[sp_ld_fact_prem_fm_APS]    Script Date: 2/27/2017 8:26:08 PM ******/
 SET ANSI_NULLS ON
@@ -9,25 +9,25 @@ GO
 
 --***************************************************************************
 -- Process name: [dbo].[sp_ld_fact_prem_fm_APS]
--- Purpose:      Load fact_prem from Stamps_ITDv2 table (s: Drive in Stamp Collector folder)
+-- Purpose:      Load XXX from Stamps_ITDv2 table (X: Drive in Stamp Collector folder)
 -- Author:       Adam Makharita
 -- Created:      09/28/2016
 --***************************************************************************
--- Parameters: @d_begin - Starting date to get data from BAPU_Stamp_Collectors_ITD
---             @d_end - Ending date to get data from [dbo].[bapu_stamp_collectors_ITD]
+-- Parameters: @d_begin - Starting date to get data from XXX_Stamp_Collectors_ITD
+--             @d_end - Ending date to get data from [dbo].[XXX_stamp_collectors_ITD]
 --***************************************************************************
 
 
 ALTER PROCEDURE [dbo].[sp_ld_fact_prem_fm_APS]
    (
-    @d_begin datetime -- Starting date to pull from [bapu_stamp_collectors_ITD] table
-   ,@d_end   datetime -- Ending date to pull from [bapu_stamp_collectors_ITD] table
+    @d_begin datetime -- Starting date to pull from [XXX_stamp_collectors_ITD] table
+   ,@d_end   datetime -- Ending date to pull from [XXX_stamp_collectors_ITD] table
    )
 AS
 SET NOCOUNT ON
 
---BAPU_Stamp_Collectors_ITD variables
-DECLARE @cbapustamp_collectors_ITD cursor
+--XXX_Stamp_Collectors_ITD variables
+DECLARE @cXXXstamp_collectors_ITD cursor
 DECLARE @id_rowcol int
 DECLARE @id_sc int
 DECLARE @account_period datetime
