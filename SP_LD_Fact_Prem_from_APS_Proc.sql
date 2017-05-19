@@ -112,7 +112,7 @@ DECLARE @prev_id_rowcol int; SET @prev_id_rowcol = 0
 --Set job parameters
 DECLARE @co_name varchar(50); SET @co_name = 'Berkley Asset Protection Underwriters'
 DECLARE @proc_name varchar(100); SET @proc_name = 'sp_ld_fact_prem_fm_APS'
-DECLARE @cycle_name varchar(100); SET @cycle_name = 'BAPU APS Processing'
+DECLARE @cycle_name varchar(100); SET @cycle_name = 'XXX APS Processing'
 DECLARE @id_job int; SET @id_job = 1010
 DECLARE @data_source varchar(10); SET @data_source = 'APS'
 DECLARE @d_inserted datetime; SET @d_inserted = GETDATE()
@@ -138,9 +138,9 @@ DECLARE @d_last date;  SET @d_last = CAST(@d_bat_end as DATE)
 DELETE FROM error_msgs WHERE proc_name = @proc_name AND id_bat = @id_bat 
 DELETE FROM fact_prem where d_book between @d_first and @d_last and data_source = @data_source
 
-SET @cbapustamp_collectors_ITD = CURSOR FOR
+SET @cXXXstamp_collectors_ITD = CURSOR FOR
 ---- Create premium record from each row
-select -- Pull all fields directly from BAPU_Stamp_Collectors_ITD for edits/validation
+select -- Pull all fields directly from XXX_Stamp_Collectors_ITD for edits/validation
        g.rowcol
 	  ,g.id_sc
 	  ,g.account_period
@@ -156,7 +156,7 @@ select -- Pull all fields directly from BAPU_Stamp_Collectors_ITD for edits/vali
 
 
       --***************************************************
-      -- Map BAPU_Stamp_Collectors_ITD data into fact_prem format
+      -- Map XXX_Stamp_Collectors_ITD data into fact_prem format
       --***************************************************
       ,g.id_sc as lPolicyLiabilityKey
       ,g.policy_number as policy_number
@@ -214,13 +214,13 @@ select -- Pull all fields directly from BAPU_Stamp_Collectors_ITD for edits/vali
       ,StateCode as cvg_state
       ,'Fine Art' as product
       ,'Stamp Collectors' as sub_product
-from bapu.dbo.bapu_stamp_collectors_ITD g
+from XXX.dbo.XXX_stamp_collectors_ITD g
 where CAST(g.account_period as DATE) between @d_first and @d_last
 
 UNION ALL
 
 -- Create commission record from each row
-select -- Pull all fields directly from BAPU_Stamp_Collectors_ITD for edits/validation
+select -- Pull all fields directly from XXX_Stamp_Collectors_ITD for edits/validation
        g.rowcol
 	  ,g.id_sc
 	  ,g.account_period
@@ -234,7 +234,7 @@ select -- Pull all fields directly from BAPU_Stamp_Collectors_ITD for edits/vali
 	  ,g.Agency_Commission_Amount
 	  ,g.Transaction_Amount
       --***************************************************
-      -- Map BAPU_Stamp_Collecotrs_ITD data into fact_prem format
+      -- Map XXX_Stamp_Collecotrs_ITD data into fact_prem format
       --***************************************************
       ,g.id_sc as lPolicyLiabilityKey
       ,g.policy_number as policy_number
@@ -296,21 +296,21 @@ select -- Pull all fields directly from BAPU_Stamp_Collectors_ITD for edits/vali
       ,statecode as cvg_state
       ,'Fine Art' as product
       ,'Stamp Collectors' as sub_product
-from bapu.dbo.bapu_stamp_collectors_ITD g
+from XXX.dbo.XXX_stamp_collectors_ITD g
 where CAST(g.account_period as DATE) between @d_first and @d_last
 order by g.RowCol
 
 
-OPEN @cbapustamp_collectors_ITD
+OPEN @cXXXstamp_collectors_ITD
 
 if @@ERROR <> 0
 BEGIN
-   print 'Unable to read data from bapu.dbo.BAPU_Stamp_Collectors_ITD'
+   print 'Unable to read data from XXX.dbo.XXX_Stamp_Collectors_ITD'
    RETURN -1
 END
 
 FETCH NEXT
-FROM @cbapustamp_collectors_ITD
+FROM @cXXXstamp_collectors_ITD
 INTO @id_rowcol
 	,@id_sc
     ,@account_period
@@ -377,7 +377,7 @@ INTO @id_rowcol
 
 IF @@ERROR <> 0
 BEGIN
-   print 'Unable to FETCH (Initial Fetch) data from cursor @cBAPU_stampcollectors_ITD'
+   print 'Unable to FETCH (Initial Fetch) data from cursor @cXXX_stampcollectors_ITD'
    RETURN -2
 END
 
@@ -673,7 +673,7 @@ BEGIN
 	  
 	   -- Determine if this policy is currently in fact_prem
 	   select @new_pol = COUNT(*)
-	   from bapu.dbo.fact_prem
+	   from XXX.dbo.fact_prem
 	   where pol_num = @pol_num
 	   
 	   --print @new_pol
@@ -686,10 +686,10 @@ BEGIN
 		  -- Find initial policy effective and expiration dates in fact_prem
 		  select @initial_pol_eff = d_pol_eff
 				,@initial_pol_exp = d_pol_exp
-		  from bapu.dbo.fact_prem fp WITH (NOLOCK)
+		  from XXX.dbo.fact_prem fp WITH (NOLOCK)
 		  Inner JOIN
 			 (select MIN(lPolicyLiabilityKey) lPolicyLiabilityKey 
-			  from bapu.dbo.fact_prem WITH (NOLOCK) 
+			  from XXX.dbo.fact_prem WITH (NOLOCK) 
 			  where pol_num = @pol_num) fp_min
 			ON fp.lPolicyLiabilityKey = fp_min.lPolicyLiabilityKey
 		  where pol_num = @pol_num
@@ -751,7 +751,7 @@ BEGIN
    ----------------------------------
    --******************************--
    
-   INSERT INTO bapu.dbo.fact_prem
+   INSERT INTO XXX.dbo.fact_prem
     (lPolicyLiabilityKey
     ,pol_num
     ,trans
@@ -812,7 +812,7 @@ BEGIN
     (@lPolicyLiabilityKey
     ,@pol_num
     ,@trans
-    ,@vers
+    ,@verS
     ,@d_book
     ,@d_pol_eff
     ,@d_pol_exp
@@ -869,7 +869,7 @@ BEGIN
    SET @prev_id_rowcol = @id_rowcol
    
 FETCH NEXT
-FROM @cbapustamp_collectors_ITD
+FROM @cXXXstamp_collectors_ITD
 INTO @id_rowcol
 	,@id_sc
     ,@account_period
@@ -936,7 +936,7 @@ INTO @id_rowcol
        
    IF @@error <> 0 
    BEGIN
-      print 'Unable to FETCH data (Repeating Fetch) from cursor @cbapustamp_collectors_ITD'
+      print 'Unable to FETCH data (Repeating Fetch) from cursor @cXXXstamp_collectors_ITD'
       RETURN -3
    END
       
@@ -945,8 +945,8 @@ INTO @id_rowcol
    
 END --End while loop
 
-CLOSE @cbapustamp_collectors_ITD
-DEALLOCATE @cbapustamp_collectors_ITD
+CLOSE @cXXXstamp_collectors_ITD
+DEALLOCATE @cXXXstamp_collectors_ITD
 
 RETURN 0
 
